@@ -1,37 +1,48 @@
 import { useState, useEffect } from "react";
 import { ref, set, update } from "firebase/database";
 import { database } from "../firebase";
-import "./Inventory.css"; // Import the custom CSS file
+import "./Inventory.css";
 import { fetchInventory } from "../firebase/inventory";
+import ItemCard from "./item-card";
 
 type InventoryType = {
   [key: string]: {
     quantity: number;
     price: number;
+    imageUrl?: string;
   };
 };
+
 const Inventory = () => {
   const [inventory, setInventory] = useState<InventoryType>({});
   const [newStock, setNewStock] = useState<InventoryType>(inventory);
-  const [newItem, setNewItem] = useState({ name: "", quantity: 0, price: 0 });
+  const [newItem, setNewItem] = useState({ name: "", quantity: 0, price: 0, image: "" });
 
   useEffect(() => {
     setNewStock(inventory);
-    console.log(inventory);
   }, [inventory]);
-  // Fetch inventory data from Firebase
+
   useEffect(() => {
     fetchInventory(setInventory);
   }, []);
 
-  // Update inventory in Firebase
   const updateInventory = async () => {
     const inventoryRef = ref(database, "inventory");
     await set(inventoryRef, newStock);
     setInventory(newStock);
   };
 
-  // Add new item to the inventory
+  const handleImageChange = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      setNewItem((prevItem) => ({
+        ...prevItem,
+        image: reader.result as string, // This sets the data URL as the image
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const addNewItem = async () => {
     if (!newItem.name) {
       alert("Item name is required");
@@ -42,6 +53,7 @@ const Inventory = () => {
     await update(inventoryRef, {
       quantity: newItem.quantity,
       price: newItem.price,
+      imageUrl: newItem.image,
     });
 
     setInventory({
@@ -49,34 +61,37 @@ const Inventory = () => {
       [newItem.name]: {
         quantity: newItem.quantity,
         price: newItem.price,
+        imageUrl: newItem.image,
       },
     });
 
-    // Clear new item fields
-    setNewItem({ name: "", quantity: 0, price: 0 });
+    setNewItem({ name: "", quantity: 0, price: 0, image: "" });
   };
 
   return (
     <div className="inventory-container">
       <div className="inventory-card">
         <h2>Inventory Management</h2>
-        {/* Display Current Inventory */}
+        
         <div className="inventory-section">
-          <h2>Current Stock</h2>
           <div className="inventory-grid">
             {Object.keys(inventory).map((key) => (
-              <p key={key}>
-                {key}: {inventory[key]?.quantity} units - ₹
-                {inventory[key]?.price}/unit
-              </p>
+              <ItemCard
+                item={{
+                  name: key,
+                  price: inventory[key]?.price,
+                  stock: inventory[key]?.quantity,
+                  imageUrl: inventory[key]?.imageUrl,
+                }}
+              />
             ))}
           </div>
         </div>
-        {/* Update Inventory */}
+        
         <div className="inventory-section">
           <h3>Update Stock</h3>
           {Object.keys(inventory).map((key) => (
-            <div className="input-group">
+            <div className="input-group" key={key}>
               <label>{key}</label>
               <input
                 type="number"
@@ -112,7 +127,7 @@ const Inventory = () => {
             Update Inventory
           </button>
         </div>
-        {/* Add New Inventory Item */}
+        
         <div className="inventory-section">
           <h3>Add New Item</h3>
           <div className="input-group">
@@ -144,6 +159,15 @@ const Inventory = () => {
                 setNewItem({ ...newItem, price: parseFloat(e.target.value) })
               }
               placeholder="Enter item price per unit"
+            />
+          </div>
+          <div className="input-group">
+            <label>Image</label>
+            <input
+              type="file"
+              onChange={(e) =>
+                e.target.files && handleImageChange(e.target.files[0])
+              }
             />
           </div>
           <button className="add-item-btn" onClick={addNewItem}>

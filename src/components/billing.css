@@ -1,5 +1,3 @@
-/* BillingScreen.css */
-
 /* Container for the entire billing page */
 .billing-container {
   max-width: 600px;
@@ -9,138 +7,196 @@
   background-color: #f4f4f9;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Header */
-  .billing-header {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  /* Form Group */
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-  }
-  
-  .form-group select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-  }
-  
-  /* Section Header */
-  .section-header {
-    font-size: 20px;
-    margin-bottom: 15px;
-    color: #007bff;
-  }
-  
-  /* Inventory List */
-  .inventory-list p {
-    background-color: #1881eb;
-    padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-  
-  /* Item Buttons */
+}
+
+/* Header */
+.billing-header {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Form Group */
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+/* Enhanced Search Input */
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  color: #333;
+  background-color: #fff;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.form-group input[type="text"]:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Enhanced Dropdown */
+.dropdown {
+  position: absolute;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  margin-top: 5px;
+}
+
+.dropdown-item {
+  padding: 10px;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f8ff;
+}
+
+/* Dropdown Scrollbar Styling */
+.dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+.dropdown::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+.dropdown::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Section Header */
+.section-header {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #007bff;
+}
+
+/* Inventory List */
+.inventory-list p {
+  background-color: #1881eb;
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  font-size: 16px;
+  color: #fff;
+}
+
+/* Item Buttons */
+.item-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.item-buttons button {
+  flex: 1 1 100px;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.item-buttons button:hover {
+  background-color: #0056b3;
+}
+
+/* Bill Summary */
+.bill-summary {
+  list-style-type: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.bill-summary li {
+  padding: 10px;
+  background-color: #f8f9fa;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  font-size: 16px;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Remove Button */
+.remove-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  background-color: #c82333;
+}
+
+/* Total Amount */
+.total-amount {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Complete Sale Button */
+.complete-btn {
+  width: 100%;
+  padding: 15px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.complete-btn:hover {
+  background-color: #218838;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
   .item-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
+    flex-direction: column;
   }
-  
-  .item-buttons button {
-    flex: 1 1 100px;
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .item-buttons button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Bill Summary */
-  .bill-summary {
-    list-style-type: none;
-    padding: 0;
-    margin-bottom: 20px;
-  }
-  
-  .bill-summary li {
-    padding: 10px;
-    background-color: #f8f9fa;
-    margin-bottom: 5px;
-    border-radius: 5px;
-    font-size: 16px;
-    color: #333;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .remove-btn {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .remove-btn:hover {
-    background-color: #c82333;
-  }
-  
-  /* Total Amount */
-  .total-amount {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  /* Complete Sale Button */
-  .complete-btn {
-    width: 100%;
-    padding: 15px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .complete-btn:hover {
-    background-color: #218838;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 600px) {
-    .item-buttons {
-      flex-direction: column;
-    }
-  }
-  
+}

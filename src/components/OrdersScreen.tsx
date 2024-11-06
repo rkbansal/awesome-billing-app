@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { database } from "../firebase";
 import { ref, get } from "firebase/database";
 import "./orderScreen.css"; // Custom CSS for styling
 
 interface Order {
+  id: string;
   customerId: string;
   customerName: string;
   items: any[];
@@ -25,9 +26,9 @@ const WhatsappButton = ({
   total: number;
 }) => {
   // Format your message with order details
-  const message = `Hello! Your order (ID: ${orderId}) placed on ${orderDate} with items: ${items.join(
+  const message = `Hello! Your order (ID: ${orderId}) placed on ${orderDate} with items: ${items?.join(
     ", "
-  )} and total amount: $${total} is being processed. Thank you for shopping with us!`;
+  )} and total amount: Rs. ${total} is being processed. Thank you for shopping with us!`;
 
   // Encode the message to be URL-friendly
   const encodedMessage = encodeURIComponent(message);
@@ -41,7 +42,6 @@ const WhatsappButton = ({
     </button>
   );
 };
-
 
 export const OrdersScreen: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -85,6 +85,10 @@ export const OrdersScreen: React.FC = () => {
     });
   };
 
+  const orderedItems = useCallback((order: Order) => {
+    return order.items?.map((item) => `${item.quantity} x ${item.name}`);
+  }, []);
+
   return (
     <div className="orders-container">
       <h2 className="orders-header">Orders</h2>
@@ -127,7 +131,7 @@ export const OrdersScreen: React.FC = () => {
             </div>
             <div className="order-items">
               <strong>Items:</strong>
-              {order.items.map((item, i) => (
+              {order.items?.map((item, i) => (
                 <div key={i} className="order-item">
                   {item.quantity} x {item.name}
                 </div>
@@ -137,7 +141,7 @@ export const OrdersScreen: React.FC = () => {
               customerNo={order.customerId}
               orderId={order.id}
               orderDate={order.date}
-              items={order.items}
+              items={orderedItems(order)}
               total={order.totalAmount}
             />
           </div>
