@@ -1,5 +1,5 @@
 import { ref, get, update } from "firebase/database";
-import { database } from "../firebase";
+import { database } from "./firebase";
 
 // Function to read all users from Firebase Realtime Database
 const readAllUsers = async () => {

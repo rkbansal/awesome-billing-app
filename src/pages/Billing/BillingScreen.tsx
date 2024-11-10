@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "./billing.css"; // Import custom CSS
-import { fetchInventory } from "../firebase/inventory";
-import readAllUsers from "../firebase/read-all-user";
-import { placeOrder } from "../firebase/order";
-import NumericInput from "./components/NumberInput";
+import { fetchInventory } from "../../firebase/inventory";
+import readAllUsers from "../../firebase/read-all-user";
+import { placeOrder } from "../../firebase/order";
+import NumericInput from "../../components/NumberInput";
+import SelectItems from "../../components/Ankus/SelectItems";
 
 const BillingScreen = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const BillingScreen = () => {
   const [items, setItems] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [paidAmount, setPaidAmout] = useState("0");
+  const [isOrderPending, setIsOrderPending] = useState(false);
 
   const total = useMemo(() => {
     return items.reduce((acc, item) => acc + item.quantity * item.price, 0);
@@ -58,25 +60,26 @@ const BillingScreen = () => {
       username: selectedCustomer ? selectedCustomer.username : "",
       balance: selectedCustomer ? selectedCustomer.balance || 0 : 0,
     });
-    setSearchTerm(selectedCustomer.username);
+    setSearchTerm(`${selectedCustomer.username}-${selectedCustomer.phone}`);
     setFilteredCustomers([]); // Hide dropdown after selection
   };
 
-  const handleAddItem = (name: string, price: string) => {
+  const handleAddItem = (name: string, price: string, quantity?: number) => {
     const existingItem = items.find((item) => item.name === name);
     const inventoryItem = inventory[name];
     if (inventoryItem.quantity === 0) {
       alert("Item out of stock");
       return;
     }
+    const actualQuantity = quantity || 1;
     if (existingItem) {
       const updatedItems = items.map((item) =>
         item.name === name
           ? {
               ...item,
               quantity:
-                item.quantity + 1 < inventoryItem.quantity
-                  ? item.quantity + 1
+                item.quantity + actualQuantity < inventoryItem.quantity
+                  ? item.quantity + actualQuantity
                   : inventoryItem.quantity,
             }
           : item
@@ -85,12 +88,60 @@ const BillingScreen = () => {
     } else {
       setItems([
         ...items,
-        { name, price, quantity: 1 < inventoryItem.quantity ? 1 : 0 },
+        {
+          name,
+          price,
+          quantity:
+            actualQuantity < inventoryItem.quantity ? actualQuantity : 0,
+        },
       ]);
     }
   };
 
-  const handleRemoveItem = (name: string) => {
+  const handleSetItemQuantity = (
+    name: string,
+    price: string,
+    quantity?: number
+  ) => {
+    const existingItem = items.find((item) => item.name === name);
+    const inventoryItem = inventory[name];
+    if (inventoryItem.quantity === 0) {
+      alert("Item out of stock");
+      return;
+    }
+    const actualQuantity = quantity || 0;
+    if (existingItem) {
+      const updatedItems = items.map((item) =>
+        item.name === name
+          ? {
+              ...item,
+              quantity:
+                actualQuantity < inventoryItem.quantity
+                  ? actualQuantity
+                  : inventoryItem.quantity,
+            }
+          : item
+      );
+      setItems(updatedItems);
+    } else {
+      setItems([
+        ...items,
+        {
+          name,
+          price,
+          quantity:
+            actualQuantity < inventoryItem.quantity ? actualQuantity : 0,
+        },
+      ]);
+    }
+  };
+
+  const handleRemoveItem = (
+    name: string,
+    price?: string,
+    quantity?: number
+  ) => {
+    console.log(price, quantity);
     const existingItem = items.find((item) => item.name === name);
     if (existingItem.quantity > 1) {
       const updatedItems = items.map((item) =>
@@ -113,8 +164,12 @@ const BillingScreen = () => {
       return;
     }
 
+    if (isOrderPending) {
+      return;
+    }
     try {
       // Step 1: Store the order in Firebase Realtime Database under "orders" node
+      setIsOrderPending(true);
       const orderId =
         (await placeOrder(
           customer,
@@ -126,6 +181,7 @@ const BillingScreen = () => {
       // Reset items and total after sale is completed
       setItems([]);
       fetchInventory(setInventory);
+      setIsOrderPending(false);
       navigate(`/order/${orderId}`);
     } catch (error) {
       console.error("Error completing sale or updating inventory:", error);
@@ -153,36 +209,21 @@ const BillingScreen = () => {
                 className="dropdown-item"
                 onClick={() => handleSelectCustomer(customer.phone)}
               >
-                {customer.username}
+                {customer.username} - {customer.phone}
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* <h3 className="section-header">Inventory</h3>
-      <div className="inventory-list">
-        {Object.keys(inventory).map((key) => (
-          <p key={key}>
-            {key}: {inventory[key].quantity} {key === "milk" ? "L" : "kg"} - ₹
-            {inventory[key].price}/{key === "milk" ? "L" : "kg"}
-          </p>
-        ))}
-      </div> */}
-
       <h3 className="section-header">Add Items</h3>
-      <div className="item-buttons">
-        {Object.keys(inventory).map((key) => (
-          <button
-            onClick={() => handleAddItem(key, inventory[key].price)}
-            style={{
-              backgroundColor: inventory[key].quantity === 0 ? "grey" : "",
-            }}
-          >
-            {key}
-          </button>
-        ))}
-      </div>
+      <SelectItems
+        handleAddItem={handleAddItem}
+        handleRemoveItem={handleRemoveItem}
+        handleSetItemQuantity={handleSetItemQuantity}
+        inventory={inventory}
+        items={items}
+      />
 
       <h3 className="section-header">Bill Summary</h3>
       <ul className="bill-summary">
@@ -205,8 +246,9 @@ const BillingScreen = () => {
       <p className="total-amount">Current: Rs.{total}</p>
       <p className="total-amount">Total: Rs.{superTotal}</p>
       <NumericInput value={paidAmount} setValue={setPaidAmout} />
+
       <button className="complete-btn" onClick={handleCompleteSale}>
-        Complete Sale
+        {isOrderPending ? "Processing Payment..." : "Complete Sale"}
       </button>
     </div>
   );

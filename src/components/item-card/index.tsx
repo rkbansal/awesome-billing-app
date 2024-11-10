@@ -1,5 +1,4 @@
 import "./index.css";
-
 export type ItemProps = {
   item: {
     imageUrl?: string;
@@ -7,9 +6,10 @@ export type ItemProps = {
     price: number;
     stock: number;
   };
+  onAdjustStock: () => void;
 };
 
-const ItemCard = ({ item }: ItemProps) => {
+const ItemCard = ({ item, onAdjustStock }: ItemProps) => {
   return (
     <div className="item-card">
       <div className="item-image">
@@ -25,7 +25,9 @@ const ItemCard = ({ item }: ItemProps) => {
         <p className={`item-stock ${item.stock < 0 ? "negative-stock" : ""}`}>
           Current Stock: {item.stock}
         </p>
-        <button className="adjust-stock-btn">Adjust Stock</button>
+        <button className="adjust-stock-btn" onClick={onAdjustStock}>
+          Adjust Stock
+        </button>
       </div>
       <div className="item-actions">
         <button className="icon-btn star-btn">⭐</button>

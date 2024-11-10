@@ -1,4 +1,4 @@
-import { database } from "../firebase";
+import { database } from "./firebase";
 import { ref, get, update } from "firebase/database";
 import { updateUser } from "./read-all-user";
 

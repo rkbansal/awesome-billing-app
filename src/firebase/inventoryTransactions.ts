@@ -1,14 +1,14 @@
-import { ref, get, set } from "firebase/database";
+import { ref, get, update } from "firebase/database";
 import { database } from "./firebase";
 
 // Function to read all users from Firebase Realtime Database
 export const getAllInventory = async () => {
   try {
     // Reference the "users" node
-    const inventoryRef = ref(database, "inventory");
+    const inventoryTransRef = ref(database, "inventory-transactions");
 
     // Fetch data from the users node
-    const snapshot = await get(inventoryRef);
+    const snapshot = await get(inventoryTransRef);
 
     if (snapshot.exists()) {
       const inventoryData = snapshot.val();
@@ -32,18 +32,18 @@ export const getAllInventory = async () => {
   }
 };
 
-export const addItemToInventory = async (item: any) => {
-  set(ref(database, "inventory/" + item.id), item)
-    .then(() => {
-      console.log("Item data saved successfully.");
-    })
-    .catch((error) => {
-      console.error("Error saving item data: ", error);
-    });
+export const addToInventoryTransaction = async (item: any) => {
+  const inventoryTransRef = ref(database, "inventory-transactions");
+  const newTransactionKey = (await get(inventoryTransRef)).size + 1; // Create a new order ID
+  item.id = newTransactionKey;
+  await update(
+    ref(database, `inventory-transactions/${newTransactionKey}`),
+    item
+  );
 };
 
 export const fetchInventory = async (setInventory: any) => {
-  const inventoryRef = ref(database, "inventory");
+  const inventoryRef = ref(database, "inventory-transactions");
   const snapshot = await get(inventoryRef);
   if (snapshot.exists()) {
     setInventory(snapshot.val());

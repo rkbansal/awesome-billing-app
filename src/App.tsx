@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import BillingScreen from "./components/BillingScreen";
-import RevenueScreen from "./components/RevenueScreen";
-import CustomerManagement from "./components/CustomerManagement";
-import InventoryScreen from "./components/InventoryScreen";
-import { OrdersScreen } from "./components/OrdersScreen";
+import BillingScreen from "./pages/Billing/BillingScreen";
+import RevenueScreen from "./pages/Revenue/RevenueScreen";
+import CustomerManagement from "./pages/Customer/CustomerManagement";
+import InventoryScreen from "./pages/Inventory/InventoryScreen";
+import { OrdersScreen } from "./pages/Order/OrdersScreen";
 import BottomNav from "./components/bottomNavBar";
 import BillComponent from "./components/components/bill-component";
 const App = () => {

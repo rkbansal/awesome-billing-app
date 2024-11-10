@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { database } from "../firebase"; // Firebase configuration
+import { database } from "../../firebase/firebase"; // Firebase configuration
 import { ref, set } from "firebase/database";
-import readAllUsers from "../firebase/read-all-user";
+import readAllUsers from "../../firebase/read-all-user";
 import "./customer.css"; // Import custom CSS
 
 const CustomerManagement = () => {
@@ -17,7 +17,7 @@ const CustomerManagement = () => {
     const allUsers = await readAllUsers();
     setUsers(allUsers as User[]);
   }, []);
-  
+
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
